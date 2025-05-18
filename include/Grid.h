@@ -8,6 +8,10 @@ typedef unsigned short int U16;
 #define SetBit(bits, bit) ((bits) |= (1U << (bit)))
 #define ClearBit(bits, bit) ((bits) &= ~(1U << (bit)))
 
+#define InvalidCell -1
+
+extern const int NumberOfClues[6];
+
 typedef struct {
     U8 cells[81];
     U16 candidates[81];
@@ -21,7 +25,6 @@ typedef struct {
     int move;
 
     GridState* history;
-    int max_moves;
 
 } Grid;
 
@@ -34,11 +37,16 @@ extern void ClearCell(Grid* grid, int cell);
 extern void MakeMove(Grid* grid, int cell, int digit);
 extern void TakeMove(Grid* grid);
 
+extern void CopyGrid(Grid* grid, Grid* copy);
+
 extern void SaveGrid(Grid* grid, const char* savepath);
 extern void LoadGrid(Grid* grid, const char* savepath);
 
 extern int NumberOfSolutions(Grid* grid);
-extern void SolveGrid(Grid* grid);
+extern int SolveGrid(Grid* grid);
+extern int SolveGridRandomised(Grid* grid);
+
+extern void GeneratePuzzle(Grid* grid, const int difficulty);
 
 extern void PrintGrid(Grid* grid);
 

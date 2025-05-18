@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include "Bool.h"
 #include "CLI.h"
@@ -51,9 +50,11 @@ void CommandLoop() {
             printf("place [digit] [row] [column]\n - Place a digit on the grid in the specified row and column\n");
             printf("clear [row] [column]\n - Reset the cell at the specified row and column\n");
             printf("print\n - Print the grid\n");
-            printf("generate [difficulty]\n - Generate a grid layout with the chosen difficulty (0 to 3, lower meaning less difficult)\n");
-            printf("nsols\n - Check the number of solutions\n");
-            printf("solve\n - Solve the current grid layout\n");
+            // tgese aren't working correctly, so I've commented tgem out
+            //printf("generate [difficulty]\n - Generate a grid layout with the chosen difficulty (0 to 5, lower meaning less difficult)\n");
+            //printf("nsols\n - Check the number of solutions\n");
+            //printf("solve\n - Solve the current grid layout\n");
+            //printf("solve-rand\n - Solve the grid, but randomise the order of digits checked rather than using 1 -> 9\n");
             printf("save [save path]\n - Save the grid layout to the specified file path\n");
             printf("load [save path]\n - Load the grid layout from the specified file path\n");
             printf("profile\n - Test the speed of MakeMove and TakeMove, the functions used in the solving algorithm.\n");
@@ -70,7 +71,8 @@ void CommandLoop() {
 
             if (sscanf(input + 6, "%d %d %d", &digit, &row, &col) != 3) {
                 printf("Incorrect usage\n");
-                printf("Usage: place [digit] [row] [column]");
+                printf("Usage: place [digit] [row] [column]\n");
+                continue;
             }
 
             if (digit < 1 || digit > 9) {
@@ -96,7 +98,8 @@ void CommandLoop() {
 
             if (sscanf(input + 6, "%d %d", &row, &col) != 2) {
                 printf("Incorrect usage\n");
-                printf("Usage: clear [row] [column]");
+                printf("Usage: clear [row] [column]\n");
+                continue;
             }
 
             if (row < 1 || row > 9) {
@@ -116,6 +119,20 @@ void CommandLoop() {
             PrintGrid(grid);
 		}
 		else if (!strncmp(input, "generate", 8)) {
+            int difficulty;
+
+            if (sscanf(input + 9, "%d", &difficulty) != 1) {
+                printf("Incorrect usage\n");
+                printf("Usage: generate [difficulty]\n");
+                continue;
+            }
+
+            if (difficulty < 0 || difficulty >= 6) {
+                printf("Invalid difficulty, expected 0-5\n");
+                continue;
+            }
+
+            GeneratePuzzle(grid, difficulty);
 		}
 		else if (!strncmp(input, "nsols", 5)) {
             int nsols = NumberOfSolutions(grid);
@@ -124,25 +141,58 @@ void CommandLoop() {
                 printf("There are no solutions\n");
             }
             else if (nsols == 1) {
-                printf("There is one solution\n");
+                printf("There is 1 solution\n");
             }
             else {
                 printf("There are %d solutions\n", nsols);
             }
 		}
+		else if (!strncmp(input, "solve-rand", 10)) { // must come before solve
+            Grid copy[1];
+            InitGrid(copy);
+            CopyGrid(grid, copy);
+
+            int solvable = SolveGridRandomised(grid);
+
+            if (!solvable) {
+                printf("Grid has no solutions\n");
+                CopyGrid(copy, grid);
+                DestroyGrid(copy);
+                continue;
+            }
+
+            PrintGrid(grid);
+            DestroyGrid(copy);
+		}
 		else if (!strncmp(input, "solve", 5)) {
-            int nsols = NumberOfSolutions(grid);
+            Grid copy[1];
+            InitGrid(copy);
+            CopyGrid(grid, copy);
 
-            if (!nsols) {
-                printf("There are no solutions\n");
-            }
-            else {
-                if (nsols > 1) {
-                    printf("There are multiple solutions, using first solution.\n");
-                }
+            int solvable = SolveGrid(grid);
 
-                SolveGrid(grid);
+            if (!solvable) {
+                printf("Grid has no solutions\n");
+                CopyGrid(copy, grid);
+                DestroyGrid(copy);
+                continue;
             }
+
+            PrintGrid(grid);
+            DestroyGrid(copy);
+
+            // int nsols = NumberOfSolutions(grid);
+
+            // if (!nsols) {
+            //     printf("There are no solutions\n");
+            // }
+            // else {
+            //     if (nsols > 1) {
+            //         printf("There are multiple solutions, using first solution.\n");
+            //     }
+
+            //     SolveGrid(grid);
+            // }
 		}
 		else if (!strncmp(input, "save", 4)) {
             char savepath[MaxPathLength];
@@ -165,8 +215,6 @@ void CommandLoop() {
             Grid _grid[1];
             InitGrid(_grid);
 
-            srand(time(NULL));
-
             int start = GetTimeMS();
 
             for (int i = 0; i < ProfileIterations; i++) {
@@ -183,6 +231,9 @@ void CommandLoop() {
             DestroyGrid(_grid);
 
             printf("Executed MakeMove followed by TakeMove %d times in %d ms\n", ProfileIterations, duration);
+        }
+        else {
+            printf("Unknown command: %s", input);
         }
     }
 

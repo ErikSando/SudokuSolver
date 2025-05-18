@@ -3,4 +3,6 @@
 
 extern int GetTimeMS();
 
+extern void GetRandomOrder(int* list);
+
 #endif

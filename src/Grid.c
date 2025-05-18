@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "Assert.h"
 #include "Grid.h"
@@ -13,6 +14,8 @@ void ClearGridHistory(Grid* grid) {
             grid->history[i].candidates[cell] = 0b111111111;
         }
     }
+
+    grid->move = 0;
 }
 
 void InitGridHistory(Grid* grid) {
@@ -41,6 +44,8 @@ void ResetGrid(Grid* grid) {
 void InitGrid(Grid* grid) {
     ResetGrid(grid);
     InitGridHistory(grid);
+
+    srand(time(NULL));
 }
 
 void DestroyGrid(Grid* grid) {
@@ -80,6 +85,10 @@ void SetCell(Grid* grid, int cell, int digit) {
 }
 
 void ClearCell(Grid* grid, int cell) {
+    // candidates need to be updated correctly, fix it!!!!!
+
+    ClearGridHistory(grid);
+
     U8 digit = grid->cells[cell];
     grid->cells[cell] = 0;
 
@@ -101,7 +110,7 @@ void ClearCell(Grid* grid, int cell) {
 
     int row = row_start / 9;
 
-    int subgrid_row = (row / 9) % 3;
+    int subgrid_row = row % 3;
     int subgrid_col = col_start % 3;
     int subgrid_topleft = (row - subgrid_row) * 9 + col_start - subgrid_col;
 
@@ -117,12 +126,11 @@ void ClearCell(Grid* grid, int cell) {
 void MakeMove(Grid* grid, int cell, int digit) {
     if (grid->move >= 81) {
         fprintf(stderr, "Grid history overflow\n");
+        DestroyGrid(grid);
         exit(1);
     }
 
     GridState* gs = &grid->history[grid->move++];
-
-    Assert(grid->move > 0);
 
     memcpy(gs->cells, grid->cells, sizeof(gs->cells));
     memcpy(gs->candidates, grid->candidates, sizeof(gs->candidates));
@@ -133,11 +141,20 @@ void MakeMove(Grid* grid, int cell, int digit) {
 void TakeMove(Grid* grid) {
     if (grid->move < 1) {
         printf("No previous moves to revert to\n");
-        return;
+        DestroyGrid(grid);
+        exit(1);
     }
 
-    GridState previous = grid->history[--grid->move];
+    GridState* previous = &grid->history[--grid->move];
 
-    memcpy(grid->cells, previous.cells, sizeof(grid->cells));
-    memcpy(grid->candidates, previous.candidates, sizeof(grid->candidates));
+    memcpy(grid->cells, previous->cells, sizeof(grid->cells));
+    memcpy(grid->candidates, previous->candidates, sizeof(grid->candidates));
+}
+
+void CopyGrid(Grid* grid, Grid* copy) {
+    memcpy(copy->cells, grid->cells, sizeof(copy->cells));
+    memcpy(copy->candidates, grid->candidates, sizeof(copy->candidates));
+    memcpy(copy->history, grid->history, sizeof(copy->history));
+
+    copy->move = grid->move;
 }
