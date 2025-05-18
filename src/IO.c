@@ -24,3 +24,17 @@ void PrintGrid(Grid* grid) {
 
     printf(" -------------------------\n");
 }
+
+void PrintCandidates(U16 candidates) {
+    for (int digit = 1; digit <= 9; digit++) {
+        printf(" %d", digit);
+    }
+
+    printf("\n");
+
+    for (int bit = 0; bit < 9; bit++) {
+        printf(" %d", GetBit(candidates, bit));
+    }
+
+    printf("\n");
+}

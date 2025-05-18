@@ -13,6 +13,8 @@ void LoadGrid(Grid* grid, const char* savepath) {
         return;
     }
 
+    ResetGrid(grid);
+
     char contents[SaveFileLength];
 
     int row = 0;

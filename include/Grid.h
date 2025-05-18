@@ -4,7 +4,7 @@
 typedef unsigned char U8;
 typedef unsigned short int U16;
 
-#define GetBit(bits, bit) ((bits) & (1U << (bit)))
+#define GetBit(bits, bit) (((bits) >> bit) & 1U)
 #define SetBit(bits, bit) ((bits) |= (1U << (bit)))
 #define ClearBit(bits, bit) ((bits) &= ~(1U << (bit)))
 
@@ -33,9 +33,9 @@ extern void InitGrid(Grid* grid);
 extern void DestroyGrid(Grid* grid);
 
 extern void SetCell(Grid* grid, int cell, int digit);
-extern void ClearCell(Grid* grid, int cell);
 extern void MakeMove(Grid* grid, int cell, int digit);
 extern void TakeMove(Grid* grid);
+extern void ClearCell(Grid* grid, int cell);
 
 extern void CopyGrid(Grid* grid, Grid* copy);
 
@@ -49,5 +49,6 @@ extern int SolveGridRandomised(Grid* grid);
 extern void GeneratePuzzle(Grid* grid, const int difficulty);
 
 extern void PrintGrid(Grid* grid);
+extern void PrintCandidates(U16 candidates);
 
 #endif
