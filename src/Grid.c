@@ -125,7 +125,14 @@ void CopyGrid(Grid* grid, Grid* copy) {
 
 void UpdateCandidates(Grid* grid) {
     for (int cell = 0; cell < 81; cell++) {
+        grid->candidates[cell] = 0b111111111;
+    }
+
+    for (int cell = 0; cell < 81; cell++) {
         U8 digit = grid->cells[cell];
+
+        if (digit < 1) continue;
+
         grid->candidates[cell] = 0U;
 
         int col_start = cell % 9;
@@ -151,7 +158,6 @@ void UpdateCandidates(Grid* grid) {
         for (int c = 0; c < 3; c++) {
             for (int r = 0; r < 3; r++) {
                 int index = subgrid_topleft + r * 9 + c;
-
                 ClearBit(grid->candidates[index], digit - 1);
             }
         }
@@ -159,42 +165,10 @@ void UpdateCandidates(Grid* grid) {
 }
 
 void ClearCell(Grid* grid, int cell) {
-    // candidates need to be updated correctly, fix it!!!!!
-
     ClearGridHistory(grid);
 
     U8 digit = grid->cells[cell];
     grid->cells[cell] = 0;
 
     UpdateCandidates(grid);
-
-    // if (digit < 1) return;
-
-    // int col_start = cell % 9;
-    // int row_start = cell - col_start;
-
-    // for (int i = 0; i < 9; i++) {
-    //     int cell1 = col_start + i * 9;
-    //     int cell2 = row_start + i;
-
-    //     Assert(cell1 >= 0 && cell1 < 81);
-    //     Assert(cell2 >= 0 && cell2 < 81);
-
-    //     SetBit(grid->candidates[cell1], digit - 1);
-    //     SetBit(grid->candidates[cell2], digit - 1);
-    // }
-
-    // int row = row_start / 9;
-
-    // int subgrid_row = row % 3;
-    // int subgrid_col = col_start % 3;
-    // int subgrid_topleft = (row - subgrid_row) * 9 + col_start - subgrid_col;
-
-    // for (int c = 0; c < 3; c++) {
-    //     for (int r = 0; r < 3; r++) {
-    //         int index = subgrid_topleft + r * 9 + c;
-    //         Assert(index >= 0 && index < 81);
-    //         SetBit(grid->candidates[index], digit - 1);
-    //     }
-    // }
 }

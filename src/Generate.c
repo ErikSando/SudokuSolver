@@ -23,6 +23,17 @@ void GetOccupiedCells(Grid* grid, int* cells) {
     memcpy(cells, o_cells, sizeof(o_cells)); // sizeof(cells) won't work because its an integer
 }
 
+void ShuffleOccupiedCells(int* cells) {
+    int length = cells[81];
+
+    for (int i = length - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int _ = cells[i];
+        cells[i] = cells[j];
+        cells[j] = _;
+    }
+}
+
 void GeneratePuzzle(Grid* grid, const int difficulty) {
     Assert(difficulty >= 0 && difficulty <= (sizeof(NumberOfClues) / sizeof(const int)));
     
@@ -30,12 +41,13 @@ void GeneratePuzzle(Grid* grid, const int difficulty) {
 
     // Fill the grid
     ResetGrid(grid);
-    int _ = SolveGrid(grid);
+    int _ = SolveGridRandomised(grid);
     Assert(_);
 
     // Remove digits while maitaining solvability until the desired number of clues is reached
     int o_cells[82];
     GetOccupiedCells(grid, o_cells);
+    //ShuffleOccupiedCells(o_cells);
 
     int remaining = o_cells[81];
     int can_remove = remaining;
@@ -59,7 +71,7 @@ void GeneratePuzzle(Grid* grid, const int difficulty) {
         }
 
         remaining--;
-        PrintGrid(grid);
+        //PrintGrid(grid);
     }
 
     if (remaining > clues) {
