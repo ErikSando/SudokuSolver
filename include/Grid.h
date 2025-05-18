@@ -34,9 +34,22 @@ extern void ClearCell(Grid* grid, int cell);
 extern void MakeMove(Grid* grid, int cell, int digit);
 extern void TakeMove(Grid* grid);
 
-extern int SaveGrid(Grid* grid, const char* savepath);
+extern void SaveGrid(Grid* grid, const char* savepath);
 extern void LoadGrid(Grid* grid, const char* savepath);
 
-extern void PrintGrid(Grid* grid);
+extern void PrintGrid(Grid* grid);\
+
+extern int NumberOfSolutions(Grid* grid);
+
+// inline int NumberOfBits(U16 bits) {
+//     int n = 0;
+
+//     while (bits) {
+//         bits &= (bits - 1);
+//         n++;
+//     }
+
+//     return n;
+// }
 
 #endif

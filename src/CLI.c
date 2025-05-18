@@ -8,6 +8,26 @@
 #include "Grid.h"
 #include "Utility.h"
 
+void GetFilePath(char* input, char* path) {
+    char* ptr = input + 5;
+
+    char savepath[MaxPathLength];
+    int i = 0;
+
+    while (ptr[i] != ' ' && ptr[i] != '\n' && ptr[i] != '\0') {
+        savepath[i] = ptr[i];
+        i++;
+
+        if (i >= MaxPathLength) {
+            printf("File path too long, maximum %d characters.\n", MaxPathLength);
+            path[0] = InvalidPath;
+        }
+    }
+
+    savepath[i] = '\0';
+    memcpy(path, savepath, strlen(savepath) + 1);
+}
+
 void CommandLoop() {
     Grid grid[1];
     InitGrid(grid);
@@ -98,37 +118,35 @@ void CommandLoop() {
 		else if (!strncmp(input, "generate", 8)) {
 		}
 		else if (!strncmp(input, "nsols", 5)) {
+            int nsols = NumberOfSolutions(grid);
+
+            if (!nsols) {
+                printf("There are no solutions\n");
+            }
+            else if (nsols == 1) {
+                printf("There is one solution\n");
+            }
+            else {
+                printf("There are %d solutions\n", nsols);
+            }
 		}
 		else if (!strncmp(input, "solve", 5)) {
 		}
 		else if (!strncmp(input, "save", 4)) {
-            char* ptr = input + 5;
-            
-            char savepath[InputBufferSize - 6];
-            int i = 0;
+            char savepath[MaxPathLength];
+            GetFilePath(input, savepath);
 
-            int fail = False;
+            if (savepath[0] == InvalidPath) continue;
 
-            while (ptr[i] != ' ' && ptr[i] != '\n' && ptr[i] != '\0') {
-                savepath[i] = ptr[i];
-                i++;
-
-                if (i >= InputBufferSize - 6) {
-                    printf("File path too long, maximum %d characters.\n", InputBufferSize - 6);
-                    fail = True;
-                    break;
-                }
-            }
-
-            if (fail) continue;
-
-            savepath[i] = '\0';
-
-            if (SaveGrid(grid, savepath)) {
-                printf("Saved grid to %s\n", savepath);
-            }
+            SaveGrid(grid, savepath);
 		}
 		else if (!strncmp(input, "load", 4)) {
+            char savepath[MaxPathLength];
+            GetFilePath(input, savepath);
+
+            if (savepath[0] == InvalidPath) continue;
+
+            LoadGrid(grid, savepath);
 		}
 		else if (!strncmp(input, "profile", 7)) {
             Grid _grid[1];

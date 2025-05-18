@@ -3,12 +3,12 @@
 #include "Bool.h"
 #include "Grid.h"
 
-int SaveGrid(Grid* grid, const char* savepath) {
+void SaveGrid(Grid* grid, const char* savepath) {
     FILE* file = fopen(savepath, "w");
 
     if (file == NULL) {
         printf("Error opening file: %s\n", savepath);
-        return False;
+        return;
     }
 
     for (int row = 0; row < 9; row++) {
@@ -22,5 +22,5 @@ int SaveGrid(Grid* grid, const char* savepath) {
 
     fclose(file);
 
-    return True;
+    printf("Saved grid to %s\n", savepath);
 }
