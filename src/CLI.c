@@ -1,14 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "Bool.h"
 #include "CLI.h"
 #include "Grid.h"
+#include "Utility.h"
 
 void CommandLoop() {
     Grid grid[1];
-
-    ResetGrid(grid);
+    InitGrid(grid);
 
     setbuf(stdin, NULL);
 	setbuf(stdout, NULL);
@@ -34,6 +36,7 @@ void CommandLoop() {
             printf("solve\n - Solve the current grid layout\n");
             printf("save [save path]\n - Save the grid layout to the specified file path\n");
             printf("load [save path]\n - Load the grid layout from the specified file path\n");
+            printf("profile\n - Test the speed of MakeMove and TakeMove, the functions used in the solving algorithm.\n");
 		}
         else if (!strncmp(input, "exit", 4)) {
             break;
@@ -67,7 +70,7 @@ void CommandLoop() {
 
             SetCell(grid, (row - 1) * 9 + (col - 1), digit);
             PrintGrid(grid);
-		}
+        }
 		else if (!strncmp(input, "clear", 5)) {
             int row, col;
 
@@ -127,5 +130,30 @@ void CommandLoop() {
 		}
 		else if (!strncmp(input, "load", 4)) {
 		}
+		else if (!strncmp(input, "profile", 7)) {
+            Grid _grid[1];
+            InitGrid(_grid);
+
+            srand(time(NULL));
+
+            int start = GetTimeMS();
+
+            for (int i = 0; i < ProfileIterations; i++) {
+                int cell = rand() % 81;
+                int digit = rand() % 9 + 1;
+
+                MakeMove(_grid, cell, digit);
+                TakeMove(_grid);
+            }
+
+            int end = GetTimeMS();
+            int duration = end - start;
+
+            DestroyGrid(_grid);
+
+            printf("Executed MakeMove followed by TakeMove %d times in %d ms\n", ProfileIterations, duration);
+        }
     }
+
+    DestroyGrid(grid);
 }

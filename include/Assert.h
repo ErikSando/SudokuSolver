@@ -8,12 +8,12 @@
 #define Assert(expr)
 #else
 #define Assert(expr)\
-if (!expr) {\
-    printf("Assert failed: %s - ", #expr);\
+if (!(expr)) {\
+    printf("Assert failed: %s\n", #expr);\
     printf("file %s ", __FILE__);\
     printf("line %d\n", __LINE__);\
     printf("on %s ", __DATE__);\
-    printf("at %s ", __TIME__);\
+    printf("at %s\n", __TIME__);\
     exit(1);\
 }
 #endif
