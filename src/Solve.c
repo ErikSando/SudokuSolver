@@ -5,7 +5,6 @@ int NumberOfSolutions(Grid* grid) {
     int free_cells = 0;
 
     for (int cell = 0; cell < 81; cell++) {
-        //int n_candidates = NumberOfBits(grid->candidates[i]);
         int candidates = 0;
 
         for (int digit = 1; digit <= 9; digit++) {
@@ -24,4 +23,8 @@ int NumberOfSolutions(Grid* grid) {
     if (!free_cells) return 1;
 
     return solutions;
+}
+
+void SolveGrid(Grid* grid) {
+    
 }

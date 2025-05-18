@@ -14,7 +14,9 @@ void SaveGrid(Grid* grid, const char* savepath) {
     for (int row = 0; row < 9; row++) {
         for (int col = 0; col < 9; col++) {
             int cell = row * 9 + col;
-            fprintf(file, "%i ", grid->cells[cell]);
+
+            fprintf(file, "%i", grid->cells[cell]);
+            if (col < 8) fprintf(file, " ");
         }
 
         fprintf(file, "\n");

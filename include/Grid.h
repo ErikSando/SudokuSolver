@@ -37,19 +37,9 @@ extern void TakeMove(Grid* grid);
 extern void SaveGrid(Grid* grid, const char* savepath);
 extern void LoadGrid(Grid* grid, const char* savepath);
 
-extern void PrintGrid(Grid* grid);\
-
 extern int NumberOfSolutions(Grid* grid);
+extern void SolveGrid(Grid* grid);
 
-// inline int NumberOfBits(U16 bits) {
-//     int n = 0;
-
-//     while (bits) {
-//         bits &= (bits - 1);
-//         n++;
-//     }
-
-//     return n;
-// }
+extern void PrintGrid(Grid* grid);
 
 #endif

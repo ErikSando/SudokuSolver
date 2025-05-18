@@ -131,6 +131,18 @@ void CommandLoop() {
             }
 		}
 		else if (!strncmp(input, "solve", 5)) {
+            int nsols = NumberOfSolutions(grid);
+
+            if (!nsols) {
+                printf("There are no solutions\n");
+            }
+            else {
+                if (nsols > 1) {
+                    printf("There are multiple solutions, using first solution.\n");
+                }
+
+                SolveGrid(grid);
+            }
 		}
 		else if (!strncmp(input, "save", 4)) {
             char savepath[MaxPathLength];
@@ -147,6 +159,7 @@ void CommandLoop() {
             if (savepath[0] == InvalidPath) continue;
 
             LoadGrid(grid, savepath);
+            PrintGrid(grid);
 		}
 		else if (!strncmp(input, "profile", 7)) {
             Grid _grid[1];
