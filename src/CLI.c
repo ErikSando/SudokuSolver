@@ -50,11 +50,10 @@ void CommandLoop() {
             printf("place [digit] [row] [column]\n - Place a digit on the grid in the specified row and column\n");
             printf("clear [row] [column]\n - Reset the cell at the specified row and column\n");
             printf("print\n - Print the grid\n");
-            // tgese aren't working correctly, so I've commented tgem out
-            //printf("generate [difficulty]\n - Generate a grid layout with the chosen difficulty (0 to 5, lower meaning less difficult)\n");
-            //printf("nsols\n - Check the number of solutions\n");
-            //printf("solve\n - Solve the current grid layout\n");
-            //printf("solve-rand\n - Solve the grid, but randomise the order of digits checked rather than using 1 -> 9\n");
+            printf("generate [no. clues] [maximum attempts]\n - Generate a grid layout with the specified number of clues. Minimum of 17 clues.\n");
+            printf("nsols\n - Check the number of solutions\n");
+            printf("solve\n - Solve the current grid layout\n");
+            printf("solve-rand\n - Solve the grid, but randomise the order of digits checked rather than using 1 -> 9\n");
             printf("save [save path]\n - Save the grid layout to the specified file path\n");
             printf("load [save path]\n - Load the grid layout from the specified file path\n");
             printf("profile\n - Test the speed of MakeMove and TakeMove, the functions used in the solving algorithm.\n");
@@ -119,20 +118,25 @@ void CommandLoop() {
             PrintGrid(grid);
 		}
 		else if (!strncmp(input, "generate", 8)) {
-            int difficulty;
+            int clues, attempts;
 
-            if (sscanf(input + 9, "%d", &difficulty) != 1) {
+            if (sscanf(input + 9, "%d %d", &clues, &attempts) != 2) {
                 printf("Incorrect usage\n");
-                printf("Usage: generate [difficulty]\n");
+                printf("Usage: generate [no. clues] [maximum attempts]\n");
                 continue;
             }
 
-            if (difficulty < 0 || difficulty >= 6) {
-                printf("Invalid difficulty, expected 0-5\n");
+            if (clues < 17 || clues > 81) {
+                printf("Invalid number of clues, expected 17-81\n");
                 continue;
             }
 
-            GeneratePuzzle(grid, difficulty);
+            if (attempts < 1) {
+                printf("Invalid maximum attempts, expected at least 1\n");
+                continue;
+            }
+
+            GeneratePuzzle(grid, clues, attempts);
 		}
 		else if (!strncmp(input, "nsols", 5)) {
             int nsols = NumberOfSolutions(grid);

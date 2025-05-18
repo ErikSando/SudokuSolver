@@ -6,8 +6,6 @@
 #include "Grid.h"
 #include "Utility.h"
 
-const int NumberOfClues[6] = { 40, 35, 30, 25, 20, 17 };
-
 void GetOccupiedCells(Grid* grid, int* cells) {
     int o_cells[82];
     int index = 0;
@@ -34,51 +32,77 @@ void ShuffleOccupiedCells(int* cells) {
     }
 }
 
-void GeneratePuzzle(Grid* grid, const int difficulty) {
-    Assert(difficulty >= 0 && difficulty <= (sizeof(NumberOfClues) / sizeof(const int)));
-    
-    const int clues = NumberOfClues[difficulty];
+void GeneratePuzzle(Grid* grid, const int clues, const int attempts) {
+    Assert(clues >= 17 && clues <= 81);
 
-    // Fill the grid
-    ResetGrid(grid);
-    int _ = SolveGridRandomised(grid);
-    Assert(_);
+    printf("Maximum attempts: %d\n", attempts);
+    printf("Attempting to generate puzzle with %d clues...\n", clues);
 
-    // Remove digits while maitaining solvability until the desired number of clues is reached
-    int o_cells[82];
-    GetOccupiedCells(grid, o_cells);
-    //ShuffleOccupiedCells(o_cells);
+    //Grid* grids[attempts];
 
-    int remaining = o_cells[81];
-    int can_remove = remaining;
+    Grid* grids = (Grid*) malloc(attempts * sizeof(Grid));
 
-    while (remaining > clues && can_remove) {
-        int index = rand() % can_remove;
-        int cell = o_cells[index];
 
-        for (int i = index; i < 80; i++) {
-            o_cells[i] = o_cells[i + 1];
+
+    int best = 81;
+    Grid* best_grid = &grids[0];
+
+    for (int a = 0; a < attempts; a++) {
+        Grid* g = &grids[a];
+
+        // Fill the grid
+        InitGrid(g);
+        ResetGrid(g);
+        int _ = SolveGridRandomised(g);
+        Assert(_);
+
+        // Remove digits while maitaining solvability until the desired number of clues is reached
+        int o_cells[82];
+        // i realised that every cell should be occupied at this point, so i dont really need this
+        GetOccupiedCells(g, o_cells);
+        ShuffleOccupiedCells(o_cells);
+
+        int remaining = 81;
+
+        for (int i = 0; i < 81; i++) {
+            if (remaining <= clues) break;
+
+            int cell = o_cells[i];
+
+            U8 digit = g->cells[cell];
+            ClearCell(g, cell);
+
+            if (NumberOfSolutions(g) != 1) {
+                SetCell(g, cell, digit);
+                continue;
+            }
+
+            remaining--;
         }
 
-        can_remove--;
-        
-        U8 digit = grid->cells[cell];
-        ClearCell(grid, cell);
-
-        if (NumberOfSolutions(grid) != 1) {
-            SetCell(grid, cell, digit);
-            continue;
+        if (remaining > clues) {
+            printf("Failed attempt %d, achieved %d clues\n", a + 1, remaining);
         }
 
-        remaining--;
-        //PrintGrid(grid);
+        if (remaining < best) {
+            best = remaining;
+            best_grid = g;
+
+            if (best <= clues) break;
+        }
     }
 
-    if (remaining > clues) {
-        printf("Failed to generate puzzle\n");
+    CopyGrid(best_grid, grid);
+
+    free(grids);
+
+    if (best > clues) {
+        printf("Failed to reach %d clues, best achieved: %d\n", clues, best);
+        PrintGrid(grid);
         return;
     }
 
     PrintGrid(grid);
     printf("Puzzle generated with %d clues\n", clues);
+    return;
 }

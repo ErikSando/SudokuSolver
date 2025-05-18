@@ -10,6 +10,8 @@ typedef unsigned short int U16;
 
 #define InvalidCell -1
 
+#define MaxGenerationAttempts 10
+
 extern const int NumberOfClues[6];
 
 typedef struct {
@@ -46,7 +48,7 @@ extern int NumberOfSolutions(Grid* grid);
 extern int SolveGrid(Grid* grid);
 extern int SolveGridRandomised(Grid* grid);
 
-extern void GeneratePuzzle(Grid* grid, const int difficulty);
+extern void GeneratePuzzle(Grid* grid, const int difficulty, const int attempts);
 
 extern void PrintGrid(Grid* grid);
 extern void PrintCandidates(U16 candidates);
